@@ -38,4 +38,7 @@ func TestConcurrentBooking(t *testing.T) {
 	if res := successes.Load(); res != 1 {
 		t.Errorf("expected exactly 1 correct booking, instead got %d", res)
 	}
+	if res := failures.Load(); res != int64(NumGoroutines)-1 {
+		t.Errorf("expected %d failures, got %d", NumGoroutines-1, res)
+	}
 }
