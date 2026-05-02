@@ -1,1 +1,41 @@
 package booking
+
+import (
+	"sync"
+	"sync/atomic"
+	"testing"
+
+	"github.com/google/uuid"
+)
+
+func TestConcurrentBooking(t *testing.T) {
+	store := NewMemoryStore()
+	service := NewService(store)
+
+	const NumGoroutines int = 1e5
+	var (
+		successes atomic.Int64
+		failures  atomic.Int64
+		wg        sync.WaitGroup
+	)
+	wg.Add(NumGoroutines)
+	for i := range NumGoroutines {
+		go func(userNumber int) {
+			defer wg.Done()
+			err := service.Book(Booking{
+				MovieID: "screen-1",
+				SeatID:  "A5",
+				UserID:  uuid.New().String(),
+			})
+			if err != nil {
+				successes.Add(1)
+			} else {
+				failures.Add(1)
+			}
+		}(i)
+	}
+	wg.Wait()
+	if res := successes.Load(); res != 1 {
+		t.Errorf("expected exactly 1 correct booking, instead got %d", res)
+	}
+}
