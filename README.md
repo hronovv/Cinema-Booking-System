@@ -1,6 +1,6 @@
 # Cinema Booking System
 
-A small **cinema seat booking** service with a Go HTTP API, **Redis** for holds and confirmations, and a **single-page static frontend**. Users pick a movie, reserve a seat with a time-limited hold, then confirm or release it.
+A small **cinema seat booking** service with a Go HTTP API, **Redis** for holds and confirmations, and a **static frontend** (`index.html`, `styles.css`, `app.js`). Users pick a movie, reserve a seat with a time-limited hold, then confirm or release it.
 
 ---
 
@@ -21,7 +21,7 @@ A small **cinema seat booking** service with a Go HTTP API, **Redis** for holds 
 | Language | Go **1.26** |
 | HTTP | `net/http` with Go **1.22+** route patterns (`{movieID}`, `{seatID}`, …) |
 | Storage | **Redis** (`github.com/redis/go-redis/v9`) |
-| Frontend | Vanilla HTML/CSS/JS under `static/` |
+| Frontend | Vanilla HTML/CSS/JS under `static/` (linked assets served by the same server) |
 
 ---
 
@@ -34,7 +34,10 @@ CinemaBookingSystem/
 │   ├── adapters/redis.go   # redis client + ping on startup
 │   ├── booking/            # domain, service, HTTP handler, Redis store
 │   └── utils/              # shared JSON helpers
-├── static/index.html        # Web UI
+├── static/
+│   ├── index.html           # Page shell
+│   ├── styles.css           # UI styles
+│   └── app.js               # Seat map, API calls, checkout/timer
 ├── docker-compose.yaml      # Redis + Redis Commander (optional UI for Redis)
 ├── Makefile                 # run, down, test
 ├── go.mod
@@ -77,7 +80,7 @@ go run ./cmd
 
 The server listens on **http://localhost:8080**.
 
-- **Web UI:** open **http://localhost:8080/** (served from `static/`).
+- **Web UI:** open **http://localhost:8080/** — `http.FileServer(http.Dir("static"))` serves `index.html` plus **`/styles.css`** and **`/app.js`**. API routes are registered **before** this catch-all so `/movies`, `/sessions`, etc. are not shadowed.
 - **API base URL:** `http://localhost:8080`
 
 ### 3. Stop infrastructure
