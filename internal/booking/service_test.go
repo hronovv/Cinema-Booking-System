@@ -27,7 +27,7 @@ func TestConcurrentBooking(t *testing.T) {
 				SeatID:  "A5",
 				UserID:  uuid.New().String(),
 			})
-			if err != nil {
+			if err == nil {
 				successes.Add(1)
 			} else {
 				failures.Add(1)
