@@ -218,9 +218,3 @@ make test
 ```
 
 The concurrent booking test uses **live Redis** on `localhost:6379` and asserts that only one goroutine succeeds booking the same seat under contention.
-
----
-
-## License / Contributing
-
-Not specified in-repo; add a license file if you open-source the project.
