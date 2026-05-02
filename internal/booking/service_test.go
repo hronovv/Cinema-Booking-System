@@ -1,6 +1,7 @@
 package booking
 
 import (
+	"cinemabooking/internal/adapters"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -9,7 +10,7 @@ import (
 )
 
 func TestConcurrentBooking(t *testing.T) {
-	store := NewMemoryStore()
+	store := NewRedisStore(adapters.NewClient("localhost:6379"))
 	service := NewService(store)
 
 	const NumGoroutines int = 1e5
@@ -22,7 +23,7 @@ func TestConcurrentBooking(t *testing.T) {
 	for i := range NumGoroutines {
 		go func(userNumber int) {
 			defer wg.Done()
-			err := service.Book(Booking{
+			_, err := service.Book(Booking{
 				MovieID: "screen-1",
 				SeatID:  "A5",
 				UserID:  uuid.New().String(),
